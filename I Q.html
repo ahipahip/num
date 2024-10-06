@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自動出題器</title>
+    <style>
+        h1, h5 {
+            text-align: center;
+        }
+
+        /* 設定框的樣式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        /* 遮罩的樣式 */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        body {
+            background-color: rgba(22, 201, 198, 0.776);
+            /* 設定背景顏色 */
+        }
+
+        #set {
+            position: fixed;
+            top: 0px;
+            right: 0px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+
+<body>
+
+
+    <img id="set" src="設定.png" />
+
+    <!-- 設定框 -->
+    <div id="modal" class="modal">
+        <h2>設定</h2>
+        <label style="color: rgb(255, 0, 195);">背景顏色設定:</label>
+        <br /><br />
+        <input type="radio" name="color" id="b" value="藍色(預設)"> 藍色(預設)
+        <input type="radio" name="color" id="y" value="淡黃色"> 黃色
+        <input type="radio" name="color" id="n" value="無"> 無(白)
+
+        <br><br>
+        <button id="closeModalBtn" style="border-radius: 50px;color: rgb(0, 0, 0);background-color: rgb(64, 113, 113);">
+            關閉設定
+        </button>
+    </div>
+    <style>
+        h1, h5 {
+            text-align: center;
+        }
+
+        body {
+            background-color: rgba(22, 201, 198, 0.776);
+            height: 1000px;
+            /* 設定背景顏色 */
+        }
+
+        #quiz {
+            margin-top: 20px;
+        }
+
+        .question {
+            margin-bottom: 10px;
+        }
+        
+        .question input {
+            width: 50px;
+        }
+
+        button {
+            width: 115px;
+            height: 40px;
+            background-color: rgb(255, 0, 149);
+            border-radius: 50px;
+            cursor: pointer;
+        }
+
+        hr {
+            color: rgb(255, 0, 0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>自動出題器</h1>
+    <h5>天行製作</h5>
+
+    <h3>請選擇位數1</h3>
+    <select name="digit1" id="digit1">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+    </select>
+
+    <h3>請選擇符號</h3>
+    <select name="symbol" id="symbol">
+        <option value="+">+</option>
+        <option value="-">-</option>
+        <option value="*">*</option>
+        <option value="/">/</option>
+    </select>
+
+    <h3>請選擇位數2</h3>
+    <select name="digit2" id="digit2">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+    </select>
+
+    <h3>請選擇題數</h3>
+    <select name="num" id="num">
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+        <option value="25">25</option>
+        <option value="30">30</option>
+    </select>
+
+    <br/><br/>
+    <button id="generateBtn">出題</button>
+
+    <hr/>
+
+    <div id="quiz"></div>
+
+    <button id="submitBtn" style="display:none;">提交答案</button>
+
+    <h2 id="result"></h2>
+
+    <script>
+        // 生成隨機數的輔助函數
+        function getRandomNumber(digit) {
+            const min = Math.pow(10, digit - 1);
+            const max = Math.pow(10, digit) - 1;
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // 生成題目的函數
+        function generateQuiz() {
+            const digit1 = parseInt(document.getElementById('digit1').value);
+            const digit2 = parseInt(document.getElementById('digit2').value);
+            const symbol = document.getElementById('symbol').value;
+            const numQuestions = parseInt(document.getElementById('num').value);
+            const quizContainer = document.getElementById('quiz');
+            quizContainer.innerHTML = ''; // 清空之前的題目
+
+            // 生成題目
+            for (let i = 1; i <= numQuestions; i++) {
+                const num1 = getRandomNumber(digit1);
+                const num2 = getRandomNumber(digit2);
+                const questionText = `${num1} ${symbol} ${num2}`;
+                
+                // 創建問題的 DOM 結構
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+                questionDiv.innerHTML = `
+                    <label for="q${i}">${i}. ${questionText} = </label>
+                    <input type="text" id="q${i}" data-answer="${eval(questionText)}">
+                `;
+                quizContainer.appendChild(questionDiv);
+            }
+            document.getElementById('submitBtn').style.display = 'block';
+        }
+
+        // 檢查答案的函數
+        function checkAnswers() {
+            const questions = document.querySelectorAll('.question input');
+            let correct = 0;
+
+            questions.forEach(question => {
+                const userAnswer = parseFloat(question.value);
+                const correctAnswer = parseFloat(question.dataset.answer);
+                
+                if (userAnswer === correctAnswer) {
+                    correct++;
+                }
+            });
+
+            // 顯示結果
+            document.getElementById('result').innerText = `你答對了 ${correct} 題，共 ${questions.length} 題。`;
+        }
+
+        // 綁定生成按鈕的點擊事件
+        document.getElementById('generateBtn').addEventListener('click', generateQuiz);
+
+        // 綁定提交按鈕的點擊事件
+        document.getElementById('submitBtn').addEventListener('click', checkAnswers);
+    </script>
+
+</body>
+
+</html>
